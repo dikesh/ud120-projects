@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from time import time
 import matplotlib.pyplot as plt
 from prep_terrain_data import makeTerrainData
 from class_vis import prettyPicture
@@ -24,19 +25,33 @@ plt.scatter(grade_slow, bumpy_slow, color = "r", label="slow")
 plt.legend()
 plt.xlabel("bumpiness")
 plt.ylabel("grade")
-plt.show()
+# plt.show()
 ################################################################################
 
 
 ### your code here!  name your classifier object clf if you want the 
 ### visualization code (prettyPicture) to show you the decision boundary
 
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
 
+# clf = KNeighborsClassifier(n_neighbors=20)
+# clf = AdaBoostClassifier(DecisionTreeClassifier(min_samples_split=20))
+clf = SVC(kernel='rbf', C=20000)
 
+t0 = time()
+clf.fit(features_train, labels_train)
+print "training time:", round(time()-t0, 3), "s"
 
+t1 = time()
+labels_pred = clf.predict(features_test)
+print "prediction time:", round(time()-t1, 3), "s"
 
-
-
+acc_score = accuracy_score(labels_test, labels_pred)
+print(acc_score)
 
 try:
     prettyPicture(clf, features_test, labels_test)
