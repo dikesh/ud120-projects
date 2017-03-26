@@ -21,10 +21,31 @@ features_train, features_test, labels_train, labels_test = preprocess()
 
 
 
-
 #########################################################
 ### your code goes here ###
 
+print "Number of features", len(features_train[0])
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# Create classifier
+clf = DecisionTreeClassifier(min_samples_split=40)
+
+t0 = time()
+clf.fit(features_train, labels_train)
+print "training time:", round(time()-t0, 3), "s"
+
+t1 = time()
+labels_predicted = clf.predict(features_test)
+print "prediction time:", round(time()-t1, 3), "s"
+
+print 'Chris', (labels_predicted == 1).sum()
+print 'Sara', (labels_predicted == 0).sum()
+
+acc_score = accuracy_score(labels_test, labels_predicted)
+
+print 'Accuracy Score', acc_score
 
 #########################################################
 
