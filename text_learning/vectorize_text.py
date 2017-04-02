@@ -55,14 +55,15 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
             # signature_words = ["sara", "shackleton", "chris", "germani"]
             # for sw in signature_words:
             #     parsed_text = parsed_text.replace(sw, '')
-            signature = re.compile(r'(sara|shackleton|chris|germani)', re.I)
+            # signature = re.compile(r'(sara|shackleton|chris|germani)', re.I)
+            signature = re.compile(r'(sara|shackleton|chris|germani|sshacklensf|cgermannsf)', re.I)
             extracted_text = signature.sub("", parsed_text)
 
             ### append the text to word_data
             word_data.append(extracted_text)
 
             ### append a 0 to from_data if email is from Sara, and 1 if email is from Chris
-            if name == 'Sara':
+            if name == 'sara':
                 from_data.append(0)
             else:
                 from_data.append(1)
