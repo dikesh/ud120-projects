@@ -7,15 +7,18 @@ sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
 
+import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
 
 # Task 1: Select what features you'll use.
 # features_list is a list of strings, each of which is a feature name.
 # The first feature must be "poi".
-features_list = ['poi', 'salary', 'bonus', 'expenses', 'from_poi_to_this_person',
-                 'from_this_person_to_poi', 'shared_receipt_with_poi']  # You will need to use more features
+features_list = ['poi', 'salary', 'bonus', 'deferred_income', 'total_stock_value', 'exercised_stock_options',
+                 'from_poi_to_this_person', 'from_this_person_to_poi', 'shared_receipt_with_poi']
 
 # Load the dictionary containing the dataset
 with open("final_project_dataset.pkl", "r") as data_file:
@@ -26,32 +29,9 @@ with open("final_project_dataset.pkl", "r") as data_file:
 data_dict.pop('TOTAL', None)
 data_dict.pop('THE TRAVEL AGENCY IN THE PARK', None)
 
-# # Convert Data to dataframe
-# df = pd.DataFrame(data_dict).T.replace('NaN', float('NaN'))
-#
-# df_salary_bonus = df[['salary', 'bonus']].dropna()
-#
-# X_salary = df_salary_bonus[['salary']].as_matrix()
-# y_bonus = df_salary_bonus[['bonus']].as_matrix()
-#
-# # Run Linear Regression
-# reg = LinearRegression()
-# reg.fit(X_salary, y_bonus)
-# # Predict bonus
-# bonus_predicted = reg.predict(X_salary)
-# # Plot
-# plt.scatter(X_salary, y_bonus)
-# plt.plot(X_salary, bonus_predicted)
-# plt.show()
-#
-# # Find error
-# df_salary_bonus = df_salary_bonus.join(pd.DataFrame(
-#     bonus_predicted, columns=['bonus_predicted', ], index=df_salary_bonus.index))
-#
-# df_salary_bonus['error'] = (df_salary_bonus.bonus - df_salary_bonus.bonus_predicted).abs()
-# df_salary_bonus = df_salary_bonus.sort_values('error')
-
-# Not removing any more data point as all these data points are potential POIs
+"""
+    Not removing any more data point as all these data points are potential POIs based on Linear Regression
+"""
 
 # Task 3: Create new feature(s)
 # Store to my_dataset for easy export below.
@@ -61,6 +41,28 @@ my_dataset = data_dict
 data = featureFormat(my_dataset, features_list, sort_keys=True)
 labels, features = targetFeatureSplit(data)
 
+
+# """
+#     Scale
+# """
+# scaler = MinMaxScaler()
+# features = scaler.fit_transform(features)
+#
+# """
+#     Select based on PCA
+# """
+# pca = PCA(n_components=3, whiten=True)
+# features = pca.fit_transform(features)
+#
+# print(pca.explained_variance_)
+# print(pca.explained_variance_ratio_)
+
+features = pd.DataFrame(features).as_matrix()
+labels = pd.DataFrame(labels).astype(int).as_matrix()
+
+
+X_train, X_test, y_train, y_test = train_test_split(features, labels, train_size=0.75, test_size=0.25)
+
 # Task 4: Try a varity of classifiers
 # Please name your classifier clf for easy export below.
 # Note that if you want to do PCA or other multi-stage operations,
@@ -68,8 +70,10 @@ labels, features = targetFeatureSplit(data)
 # http://scikit-learn.org/stable/modules/pipeline.html
 
 # Provided to give you a starting point. Try a variety of classifiers.
-from sklearn.naive_bayes import GaussianNB
-clf = GaussianNB()
+# from sklearn.naive_bayes import GaussianNB
+# clf = GaussianNB()
+from sklearn.ensemble import GradientBoostingClassifier
+clf = GradientBoostingClassifier(max_depth=6, max_features=0.4, min_samples_leaf=1, min_samples_split=7, subsample=0.8)
 
 # Task 5: Tune your classifier to achieve better than .3 precision and recall
 # using our testing script. Check the tester.py script in the final project
